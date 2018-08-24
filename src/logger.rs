@@ -17,6 +17,5 @@ impl Log for SimpleLogger {
 }
 
 pub fn init() -> Result<(), SetLoggerError> {
-    set_logger(&SimpleLogger)
-        .map(|()| set_max_level(LevelFilter::Trace))
+    set_logger(&SimpleLogger).map(|()| set_max_level(LevelFilter::Trace))
 }

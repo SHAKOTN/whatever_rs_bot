@@ -7,7 +7,7 @@ extern crate serde;
 extern crate serde_derive;
 
 use std::{thread, time};
-use std::collections::HashMap;
+//use std::collections::HashMap;
 use std::env;
 
 mod parse;
