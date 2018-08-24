@@ -1,5 +1,6 @@
+#[macro_use]
+extern crate log;
 extern crate reqwest;
-
 extern crate serde_json;
 extern crate serde;
 #[macro_use]
@@ -10,6 +11,7 @@ use std::collections::HashMap;
 use std::env;
 
 mod parse;
+mod logger;
 
 fn get_bot_token() -> String {
     return match env::var("TELEGRAM_BOT_TOKEN") {
@@ -18,8 +20,12 @@ fn get_bot_token() -> String {
     };
 }
 
+
 fn main() {
+    logger::init().expect("Cannot setup logger");
+
     let token: String = get_bot_token();
+
     let mut _offset: i32;
     loop {
         let client = reqwest::Client::new();
@@ -38,7 +44,7 @@ fn main() {
         let text = response_test.text().unwrap();
 
         let parsed_response: parse::TResponse = parse::parse_response(text.as_str()).unwrap();
-        println!("{:#?}", parsed_response);
+        info!("{:#?}", parsed_response);
 
         thread::sleep(time::Duration::from_millis(1000));
     }
