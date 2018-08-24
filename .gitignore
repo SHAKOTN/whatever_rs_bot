@@ -1,0 +1,9 @@
+/target
+**/*.rs.bk
+.DS_Store
+.penv
+.idea/
+.settings
+.cache
+dump.rdb
+build/
