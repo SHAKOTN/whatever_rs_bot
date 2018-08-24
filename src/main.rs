@@ -29,15 +29,15 @@ fn main() {
     let mut _offset: i32;
     loop {
         let client = reqwest::Client::new();
-        let mut map = HashMap::new();
+//        let mut request_body = HashMap::new();
         let url = format!("https://api.telegram.org/bot{}/getUpdates", token);
 
-        map.insert("offset", 267956369);
+//        request_body.insert("offset", 267956369);
 
         let mut response_test  = client.post(
             url.as_str()
         )
-//            .json(&map)
+//            .json(&request_body)
             .send()
             .unwrap();
 
