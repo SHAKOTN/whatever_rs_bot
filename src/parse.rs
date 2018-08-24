@@ -18,7 +18,7 @@ struct TResult {
 struct TMessage {
     date: i32,
     message_id: i8,
-    text: String,
+    text: Option<String>,
 }
 
 
