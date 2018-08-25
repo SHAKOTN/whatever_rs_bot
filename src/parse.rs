@@ -3,33 +3,33 @@ use serde_json::from_str;
 
 #[derive (Debug, Serialize, Deserialize)]
 pub struct TResponse {
-    ok: bool,
-    result: Option<Vec<TResult>>,
+    pub ok: bool,
+    pub result: Option<Vec<TResult>>,
 }
 
 #[derive (Debug, Serialize, Deserialize)]
-struct TResult {
-    message: TMessage,
-    update_id: i32,
+pub struct TResult {
+    pub message: TMessage,
+    pub update_id: i32,
 }
 
 
 #[derive (Debug, Serialize, Deserialize)]
-struct TMessage {
-    date: i32,
-    message_id: i8,
-    text: Option<String>,
-    sticker: Option<TSticker>,
+pub struct TMessage {
+    pub date: i32,
+    pub message_id: i8,
+    pub text: Option<String>,
+    pub sticker: Option<TSticker>,
 }
 
 #[derive (Debug, Serialize, Deserialize)]
-struct TSticker {
-    emoji: String,
-    file_id: String,
-    file_size: i32,
-    set_name: String,
-    height: i16,
-    width: i16
+pub struct TSticker {
+    pub emoji: String,
+    pub file_id: String,
+    pub file_size: i32,
+    pub set_name: String,
+    pub height: i16,
+    pub width: i16
 }
 
 pub fn parse_response(t_response: &str) -> Result<TResponse, Error> {
