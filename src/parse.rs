@@ -18,8 +18,28 @@ pub struct TResult {
 pub struct TMessage {
     pub date: i32,
     pub message_id: i8,
+    pub chat: TChat,
+    pub from: TFrom,
     pub text: Option<String>,
     pub sticker: Option<TSticker>,
+}
+
+#[derive (Debug, Serialize, Deserialize)]
+pub struct TFrom {
+    pub id: i32,
+    pub first_name: String,
+    pub last_name: String,
+    pub username: String,
+    pub language_code: String,
+    pub is_bot: bool,
+}
+
+#[derive (Debug, Serialize, Deserialize)]
+pub struct TChat {
+    pub id: i32,
+    pub title: Option<String>,
+    #[serde(rename="type")]
+    pub chat_type: String,
 }
 
 #[derive (Debug, Serialize, Deserialize)]

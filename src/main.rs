@@ -53,6 +53,6 @@ fn main() {
             offset = result.update_id + 1;
         }
 
-        thread::sleep(time::Duration::from_millis(1000));
+        thread::sleep(time::Duration::from_millis(100));
     }
 }
