@@ -9,7 +9,7 @@ pub struct TResponse {
 
 #[derive (Debug, Serialize, Deserialize)]
 pub struct TResult {
-    pub message: TMessage,
+    pub message: Option<TMessage>,
     pub update_id: i32,
 }
 
@@ -17,9 +17,9 @@ pub struct TResult {
 #[derive (Debug, Serialize, Deserialize)]
 pub struct TMessage {
     pub date: i32,
-    pub message_id: i8,
-    pub chat: TChat,
-    pub from: TFrom,
+    pub message_id: i32,
+    pub chat: Option<TChat>,
+    pub from: Option<TFrom>,
     pub text: Option<String>,
     pub sticker: Option<TSticker>,
 }
@@ -28,10 +28,10 @@ pub struct TMessage {
 pub struct TFrom {
     pub id: i32,
     pub first_name: String,
-    pub last_name: String,
-    pub username: String,
-    pub language_code: String,
     pub is_bot: bool,
+    pub last_name: Option<String>,
+    pub username: Option<String>,
+    pub language_code: Option<String>,
 }
 
 #[derive (Debug, Serialize, Deserialize)]
@@ -40,14 +40,16 @@ pub struct TChat {
     pub title: Option<String>,
     #[serde(rename="type")]
     pub chat_type: String,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
 }
 
 #[derive (Debug, Serialize, Deserialize)]
 pub struct TSticker {
-    pub emoji: String,
     pub file_id: String,
+    pub emoji: Option<String>,
     pub file_size: i32,
-    pub set_name: String,
+    pub set_name: Option<String>,
     pub height: i16,
     pub width: i16
 }
