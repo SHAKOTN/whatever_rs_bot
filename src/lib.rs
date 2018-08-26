@@ -8,6 +8,7 @@ extern crate serde_derive;
 
 use std::env;
 use std::collections::HashMap;
+use std::{thread, time};
 
 use serde_json::Error;
 
@@ -34,6 +35,19 @@ impl TBot {
         }
     }
 
+    pub fn run(&self) {
+        let mut offset: i32 = 0;
+        loop {
+            let parsed_response = self.get_updates(&offset).unwrap();
+            for result in parsed_response.result.unwrap() {
+                // Telegram API requires to make getUpdates request with offset,
+                // To drop old events
+                offset = result.update_id + 1;
+            }
+
+            thread::sleep(time::Duration::from_millis(100));
+        }
+    }
     pub fn get_updates(&self, offset: &i32) -> Result<parse::TResponse, Error> {
         let client = reqwest::Client::new();
         let mut request_body = HashMap::new();
