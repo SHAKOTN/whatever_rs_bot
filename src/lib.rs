@@ -11,10 +11,28 @@ use std::collections::HashMap;
 use std::{thread, time};
 
 use serde_json::Error;
+use serde::ser::{Serialize, Serializer};
 
 mod parse;
 mod logger;
 
+#[derive (Debug)]
+enum TValue<'a> {
+    String(&'a str),
+    Int(&'a i32)
+}
+
+impl<'a> Serialize for TValue<'a>{
+     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+     where
+         S: Serializer,
+     {
+         match *self {
+             TValue::String(ref s) => serializer.serialize_newtype_variant("TValue", 0, "String", s),
+             TValue::Int(i) => serializer.serialize_newtype_variant("TValue", 1, "Int", &i),
+         }
+     }
+}
 
 pub fn get_bot_token() -> String {
     return match env::var("TELEGRAM_BOT_TOKEN") {
@@ -38,11 +56,14 @@ impl TBot {
         }
     }
 
-    fn api_req(&self, method: &str, req_body: HashMap<&str, &i32>) -> String {
+    fn api_req(&self, method: &str, req_body: HashMap<&str, TValue>) -> String {
 
         let url = format!(
             "https://api.telegram.org/bot{}/{}", self.token, method
         );
+        println!("{:#?}", req_body);
+        let serialized = serde_json::to_string(&req_body).unwrap();
+        println!("{}", serialized);
         let mut response  = self.client.post(
             url.as_str()
         )
@@ -55,7 +76,7 @@ impl TBot {
 
     fn get_updates(&self, offset: &i32) -> Result<parse::TResponse, Error> {
         let mut request_body = HashMap::new();
-        request_body.insert("offset", offset);
+        request_body.insert("offset", TValue::Int(offset));
 
         let raw_response = self.api_req("getUpdates", request_body);
         let parsed_response = parse::parse_response(
