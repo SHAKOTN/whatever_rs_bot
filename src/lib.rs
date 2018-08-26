@@ -14,9 +14,6 @@ use serde_json::Error;
 mod parse;
 mod logger;
 
-pub struct TBot {
-    pub token: String
-}
 
 pub fn get_bot_token() -> String {
     return match env::var("TELEGRAM_BOT_TOKEN") {
@@ -24,6 +21,11 @@ pub fn get_bot_token() -> String {
         Err(e) => panic!("Couldn't read TELEGRAM_BOT_TOKEN ({})", e),
     };
 }
+
+pub struct TBot {
+    pub token: String
+}
+
 impl TBot {
     pub fn new(token: String) -> TBot {
         logger::init().expect("Cannot setup logger");
