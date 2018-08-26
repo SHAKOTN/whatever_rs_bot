@@ -24,49 +24,89 @@ pub fn get_bot_token() -> String {
 }
 
 pub struct TBot {
-    pub token: String
+    pub token: String,
+    client: reqwest::Client
 }
 
 impl TBot {
     pub fn new(token: String) -> TBot {
+
         logger::init().expect("Cannot setup logger");
         TBot {
-            token
+            token,
+            client: reqwest::Client::new()
         }
+    }
+
+    fn api_req(&self, method: &str, req_body: HashMap<&str, &i32>) -> String {
+
+        let url = format!(
+            "https://api.telegram.org/bot{}/{}", self.token, method
+        );
+        let mut response  = self.client.post(
+            url.as_str()
+        )
+            .json(&req_body)
+            .send()
+            .unwrap();
+
+        response.text().unwrap()
+    }
+
+    fn get_updates(&self, offset: &i32) -> Result<parse::TResponse, Error> {
+        let mut request_body = HashMap::new();
+        request_body.insert("offset", offset);
+
+        let raw_response = self.api_req("getUpdates", request_body);
+        let parsed_response = parse::parse_response(
+            raw_response.as_str()
+        );
+
+        info!("{:#?}", parsed_response);
+
+        parsed_response
     }
 
     pub fn run(&self) {
         let mut offset: i32 = 0;
         loop {
             let parsed_response = self.get_updates(&offset).unwrap();
-            for result in parsed_response.result.unwrap() {
-                // Telegram API requires to make getUpdates request with offset,
-                // To drop old events
-                offset = result.update_id + 1;
-            }
+            let updates = if parsed_response.updates.is_some() {
+                parsed_response.updates.unwrap()
+            } else {
+                // Continue main infinite loop
+                continue;
+            };
+            for update in updates {
+                let message = if update.message.is_some() {
+                    update.message.unwrap()
+                } else {
+                    continue;
+                };
 
+                let text = message.text.unwrap();
+                let chat = if message.chat.is_some() {
+                    message.chat.unwrap()
+                } else {
+                    continue;
+                };
+//                let raw_chat_id = chat.id.to_string();
+//                let chat_id = raw_chat_id.as_str();
+//                println!("{}", text.as_str());
+//                match text.as_str() {
+//                    "/say_hello" => {
+//                        let mut request_body = HashMap::new();
+//                        request_body.insert("chat_id", chat_id);
+//                        request_body.insert("text", "Hello!");
+//                        self.api_req("sendMessage", request_body);
+//                    }
+//                    _ => {}
+//                };
+                 // Telegram API requires to make getUpdates request with offset,
+                 // To drop old events
+                offset = update.update_id + 1;
+            }
             thread::sleep(time::Duration::from_millis(100));
         }
-    }
-    pub fn get_updates(&self, offset: &i32) -> Result<parse::TResponse, Error> {
-        let client = reqwest::Client::new();
-        let mut request_body = HashMap::new();
-        request_body.insert("offset", offset);
-
-        let url = format!("https://api.telegram.org/bot{}/getUpdates", self.token);
-        let mut response  = client.post(
-            url.as_str()
-        )
-            .json(&request_body)
-            .send()
-            .unwrap();
-
-        let text = response.text().unwrap();
-
-        let parsed_response = parse::parse_response(text.as_str());
-
-        info!("{:#?}", parsed_response);
-
-        parsed_response
     }
 }

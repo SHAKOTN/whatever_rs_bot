@@ -4,11 +4,12 @@ use serde_json::from_str;
 #[derive (Debug, Serialize, Deserialize)]
 pub struct TResponse {
     pub ok: bool,
-    pub result: Option<Vec<TResult>>,
+    #[serde(rename="result")]
+    pub updates: Option<Vec<TUpdate>>,
 }
 
 #[derive (Debug, Serialize, Deserialize)]
-pub struct TResult {
+pub struct TUpdate {
     pub message: Option<TMessage>,
     pub update_id: i32,
 }
