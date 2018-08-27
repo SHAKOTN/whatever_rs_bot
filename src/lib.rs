@@ -15,6 +15,13 @@ use serde_json::Error;
 mod parse;
 mod logger;
 
+#[derive(Serialize, Debug)]
+#[serde(untagged)]
+enum TValue<'a> {
+    String(&'a str),
+    Int(&'a i32)
+}
+
 
 pub fn get_bot_token() -> String {
     return match env::var("TELEGRAM_BOT_TOKEN") {
@@ -38,7 +45,7 @@ impl TBot {
         }
     }
 
-    fn api_req(&self, method: &str, req_body: HashMap<&str, &i32>) -> String {
+    fn api_req(&self, method: &str, req_body: HashMap<&str, TValue>) -> String {
 
         let url = format!(
             "https://api.telegram.org/bot{}/{}", self.token, method
@@ -55,7 +62,7 @@ impl TBot {
 
     fn get_updates(&self, offset: &i32) -> Result<parse::TResponse, Error> {
         let mut request_body = HashMap::new();
-        request_body.insert("offset", offset);
+        request_body.insert("offset", TValue::Int(offset));
 
         let raw_response = self.api_req("getUpdates", request_body);
         let parsed_response = parse::parse_response(
@@ -90,18 +97,16 @@ impl TBot {
                 } else {
                     continue;
                 };
-//                let raw_chat_id = chat.id.to_string();
-//                let chat_id = raw_chat_id.as_str();
-//                println!("{}", text.as_str());
-//                match text.as_str() {
-//                    "/say_hello" => {
-//                        let mut request_body = HashMap::new();
-//                        request_body.insert("chat_id", chat_id);
-//                        request_body.insert("text", "Hello!");
-//                        self.api_req("sendMessage", request_body);
-//                    }
-//                    _ => {}
-//                };
+                let chat_id = chat.id;
+                match text.as_ref() {
+                    "/say_hello" => {
+                        let mut request_body = HashMap::new();
+                        request_body.insert("chat_id", TValue::Int(&chat_id));
+                        request_body.insert("text", TValue::String("Hello!"));
+                        self.api_req("sendMessage", request_body);
+                    }
+                    _ => {}
+                };
                  // Telegram API requires to make getUpdates request with offset,
                  // To drop old events
                 offset = update.update_id + 1;
