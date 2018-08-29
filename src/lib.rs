@@ -19,7 +19,8 @@ mod logger;
 #[serde(untagged)]
 enum TValue<'a> {
     String(&'a str),
-    Int(&'a i32)
+    Int(&'a i32),
+    Int64(&'a i64)
 }
 
 
@@ -91,7 +92,11 @@ impl TBot {
                     continue;
                 };
 
-                let text = message.text.unwrap();
+                let text = if message.text.is_some() {
+                    message.text.unwrap()
+                } else {
+                    continue;
+                };
                 let chat = if message.chat.is_some() {
                     message.chat.unwrap()
                 } else {
@@ -101,7 +106,7 @@ impl TBot {
                 match text.as_ref() {
                     "/say_hello" => {
                         let mut request_body = HashMap::new();
-                        request_body.insert("chat_id", TValue::Int(&chat_id));
+                        request_body.insert("chat_id", TValue::Int64(&chat_id));
                         request_body.insert("text", TValue::String("Hello!"));
                         self.api_req("sendMessage", request_body);
                     }

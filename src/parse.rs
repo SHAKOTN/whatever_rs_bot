@@ -37,7 +37,7 @@ pub struct TFrom {
 
 #[derive (Debug, Serialize, Deserialize)]
 pub struct TChat {
-    pub id: i32,
+    pub id: i64,
     pub title: Option<String>,
     #[serde(rename="type")]
     pub chat_type: String,
