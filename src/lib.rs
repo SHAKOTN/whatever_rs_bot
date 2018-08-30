@@ -70,12 +70,13 @@ impl TBot {
             raw_response.as_str()
         );
 
-        info!("{:#?}", parsed_response);
+//        info!("{:#?}", parsed_response);
 
         parsed_response
     }
 
     pub fn run(&self) {
+        info!("TBot is up!");
         let mut offset: i32 = 0;
         loop {
             let parsed_response = self.get_updates(&offset).unwrap();
@@ -97,6 +98,7 @@ impl TBot {
                 } else {
                     continue;
                 };
+                info!("{:#?}", text);
                 let chat = if message.chat.is_some() {
                     message.chat.unwrap()
                 } else {
@@ -112,8 +114,8 @@ impl TBot {
                     }
                     _ => {}
                 };
-                 // Telegram API requires to make getUpdates request with offset,
-                 // To drop old events
+                // Telegram API requires to make getUpdates request with offset,
+                // To drop old events
                 offset = update.update_id + 1;
             }
             thread::sleep(time::Duration::from_millis(100));
