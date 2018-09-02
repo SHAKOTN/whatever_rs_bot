@@ -24,7 +24,8 @@ enum TValue<'a> {
 }
 
 pub trait Feature {
-
+    fn matches(&self, command: &str) -> bool;
+    fn handle(&self);
 }
 
 pub fn get_bot_token() -> String {
@@ -104,6 +105,9 @@ impl TBot {
                     continue;
                 };
                 info!("{:#?}", text);
+                for feature in self.features.as_ref().unwrap() {
+                    if feature.matches(&text.as_str()) {}
+                }
                 let chat = if message.chat.is_some() {
                     message.chat.unwrap()
                 } else {
