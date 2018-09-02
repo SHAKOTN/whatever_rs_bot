@@ -23,6 +23,9 @@ enum TValue<'a> {
     Int64(&'a i64)
 }
 
+pub trait Feature {
+
+}
 
 pub fn get_bot_token() -> String {
     return match env::var("TELEGRAM_BOT_TOKEN") {
@@ -33,7 +36,8 @@ pub fn get_bot_token() -> String {
 
 pub struct TBot {
     pub token: String,
-    client: reqwest::Client
+    pub features: Option<Vec<Box<Feature>>>,
+    client: reqwest::Client,
 }
 
 impl TBot {
@@ -42,6 +46,7 @@ impl TBot {
         logger::init().expect("Cannot setup logger");
         TBot {
             token,
+            features: None,
             client: reqwest::Client::new()
         }
     }
