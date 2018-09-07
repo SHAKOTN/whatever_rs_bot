@@ -1,5 +1,5 @@
-use serde_json::Error;
 use reqwest;
+use serde_json::Error;
 use std::collections::HashMap;
 use std::env;
 use std::{thread, time};
@@ -7,13 +7,12 @@ use std::{thread, time};
 use logger;
 use parse;
 
-
 #[derive(Serialize, Debug)]
 #[serde(untagged)]
 pub enum TValue<'a> {
     String(&'a str),
     Int(&'a i32),
-    Int64(&'a i64)
+    Int64(&'a i64),
 }
 
 pub trait AbsTBot {
@@ -23,13 +22,14 @@ pub trait AbsTBot {
     fn token(&self) -> &str;
 
     fn api_req(&self, method: &str, req_body: HashMap<&str, TValue>) -> String {
-
         let url = format!(
-            "https://api.telegram.org/bot{}/{}", self.token().to_string(), method
+            "https://api.telegram.org/bot{}/{}",
+            self.token().to_string(),
+            method
         );
-        let mut response  = self.client().post(
-            url.as_str()
-        )
+        let mut response = self
+            .client()
+            .post(url.as_str())
             .json(&req_body)
             .send()
             .unwrap();
@@ -59,12 +59,11 @@ pub struct TBot {
 
 impl AbsTBot for TBot {
     fn new(token: String) -> TBot {
-
         logger::init().expect("Cannot setup logger");
         TBot {
             token,
             features: None,
-            client: reqwest::Client::new()
+            client: reqwest::Client::new(),
         }
     }
     fn get_updates(&self, offset: &i32) -> Result<parse::TResponse, Error> {
@@ -72,11 +71,9 @@ impl AbsTBot for TBot {
         request_body.insert("offset", TValue::Int(offset));
 
         let raw_response = self.api_req("getUpdates", request_body);
-        let parsed_response = parse::parse_response(
-            raw_response.as_str()
-        );
+        let parsed_response = parse::parse_response(raw_response.as_str());
 
-//        info!("{:#?}", parsed_response);
+        //        info!("{:#?}", parsed_response);
 
         parsed_response
     }
@@ -111,9 +108,9 @@ impl AbsTBot for TBot {
                     continue;
                 };
                 info!("{:#?}", text);
-//                for feature in self.features.as_ref().unwrap() {
-//                    if feature.matches(&text.as_str()) {}
-//                }
+                //                for feature in self.features.as_ref().unwrap() {
+                //                    if feature.matches(&text.as_str()) {}
+                //                }
                 let chat = if message.chat.is_some() {
                     message.chat.unwrap()
                 } else {

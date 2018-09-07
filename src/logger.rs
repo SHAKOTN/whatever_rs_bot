@@ -1,4 +1,4 @@
-use log::{Log, Record, Level, Metadata, SetLoggerError, LevelFilter, set_logger, set_max_level};
+use log::{set_logger, set_max_level, Level, LevelFilter, Log, Metadata, Record, SetLoggerError};
 
 struct SimpleLogger;
 
