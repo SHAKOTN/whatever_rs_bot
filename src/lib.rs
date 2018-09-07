@@ -13,11 +13,12 @@ use std::{thread, time};
 use serde_json::Error;
 
 mod parse;
+pub mod bot;
 mod logger;
 
 #[derive(Serialize, Debug)]
 #[serde(untagged)]
-enum TValue<'a> {
+pub enum TValue<'a> {
     String(&'a str),
     Int(&'a i32),
     Int64(&'a i64)
@@ -41,8 +42,8 @@ pub struct TBot {
     client: reqwest::Client,
 }
 
-impl TBot {
-    pub fn new(token: String) -> TBot {
+impl bot::AbsTBot for TBot {
+    fn new(token: String) -> TBot {
 
         logger::init().expect("Cannot setup logger");
         TBot {
@@ -51,22 +52,6 @@ impl TBot {
             client: reqwest::Client::new()
         }
     }
-
-    fn api_req(&self, method: &str, req_body: HashMap<&str, TValue>) -> String {
-
-        let url = format!(
-            "https://api.telegram.org/bot{}/{}", self.token, method
-        );
-        let mut response  = self.client.post(
-            url.as_str()
-        )
-            .json(&req_body)
-            .send()
-            .unwrap();
-
-        response.text().unwrap()
-    }
-
     fn get_updates(&self, offset: &i32) -> Result<parse::TResponse, Error> {
         let mut request_body = HashMap::new();
         request_body.insert("offset", TValue::Int(offset));
@@ -80,8 +65,14 @@ impl TBot {
 
         parsed_response
     }
+    fn client(&self) -> &reqwest::Client {
+        &self.client
+    }
+    fn token(&self) -> &str {
+        self.token.as_str()
+    }
 
-    pub fn run(&self) {
+    fn run(&self) {
         info!("TBot is up!");
         let mut offset: i32 = 0;
         loop {
@@ -105,9 +96,9 @@ impl TBot {
                     continue;
                 };
                 info!("{:#?}", text);
-                for feature in self.features.as_ref().unwrap() {
-                    if feature.matches(&text.as_str()) {}
-                }
+//                for feature in self.features.as_ref().unwrap() {
+//                    if feature.matches(&text.as_str()) {}
+//                }
                 let chat = if message.chat.is_some() {
                     message.chat.unwrap()
                 } else {
